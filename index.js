@@ -129,6 +129,14 @@ async function safeDM(user, content) {
   }
 }
 
+function questionsFooter() {
+  return [
+    ``,
+    `❓ **Questions?**`,
+    `DM <@1374514852701143091> or message us on Telegram: https://t.me/waroncappers`,
+  ].join("\n");
+}
+
 function welcomeDM(userId) {
   return [
     `Hey <@${userId}> 👋`,
@@ -136,15 +144,23 @@ function welcomeDM(userId) {
     ``,
     `I just unlocked **2 days of VIP access** for you.`,
     ``,
-    `This is exactly what our paid members see:`,
-    `✅ Real picks from famous cappers`,
-    `✅ Posted before games`,
-    `✅ No fluff, no BS`,
+    `Here’s how the server works 👇`,
     ``,
-    `⏳ You’ve got **48 hours** to check out the cappers we get and decide.`,
+    `🆓 **Free section**`,
+    `• Smaller & mid-tier cappers`,
+    `• Higher volume, mixed performance`,
     ``,
-    `Head to <#1447652697992855703> and see if it’s worth keeping 🔍`,
+    `💎 **VIP section**`,
+    `• Our **highest-performing cappers**`,
+    `• Consistently **higher win rates & stronger ROI**`,
+    `• Big-name accounts people usually pay full price for`,
+    `• Picks posted before games — no fluff`,
+    ``,
+    `⏳ You’ve got **48 hours** to review the VIP results and decide.`,
+    ``,
+    `Open the server and head to **📈 VIP CAPPERS (ELITE)** to check it out 🔍`,
     `I’ll send the upgrade link when your trial ends.`,
+    questionsFooter(),
   ].join("\n");
 }
 
@@ -152,14 +168,16 @@ function expiredDM(userId) {
   return [
     `Hey <@${userId}> — your **VIP trial just ended** ⏳`,
     ``,
-    `Your access to the VIP capper picks is now locked.`,
+    `Access to the **highest-performing, highest-ROI cappers** is now locked.`,
     ``,
-    `🔓 Get VIP back instantly here:`,
+    `You’ll still see the free cappers — but VIP is where the`,
+    `**strongest win rates and best long-term edges** live.`,
+    ``,
+    `🔓 Restore VIP access instantly here:`,
     `👉 ${PAYMENT_LINK}`,
     ``,
     `Once you checkout, access is restored automatically — no waiting.`,
-    ``,
-    `Most members rejoin the same day so they don’t miss plays.`,
+    questionsFooter(),
   ].join("\n");
 }
 
@@ -169,12 +187,17 @@ function noTrialDM(userId) {
     ``,
     `You’ve already used your free VIP trial on this account.`,
     ``,
-    `If you want access again, you can unlock VIP here:`,
+    `You can still view the free cappers, but the`,
+    `**highest win-rate and highest-ROI cappers** are VIP-only.`,
+    ``,
+    `🔓 Unlock full VIP access here:`,
     `👉 ${PAYMENT_LINK}`,
     ``,
     `Access is instant after checkout 🔐`,
+    questionsFooter(),
   ].join("\n");
 }
+
 
 
 // ---------- Join flow ----------
