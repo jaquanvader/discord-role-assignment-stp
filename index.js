@@ -143,7 +143,7 @@ function welcomeDM(userId) {
     ``,
     `⏳ You’ve got **48 hours** to check results and decide.`,
     ``,
-    `Head to **VIP Picks** and see if it’s worth keeping 🔍`,
+    `Head to <#1447652697992855703> and see if it’s worth keeping 🔍`,
     `I’ll send the upgrade link when your trial ends.`,
   ].join("\n");
 }
