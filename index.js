@@ -131,39 +131,51 @@ async function safeDM(user, content) {
 
 function welcomeDM(userId) {
   return [
-    `Hey <@${userId}> — welcome to **SplitThePicks** 🟣`,
+    `Hey <@${userId}> 👋`,
+    `Welcome to **SplitThePicks** 😈`,
     ``,
-    `We leak **famous sports cappers’ picks daily** so you don’t have to pay full price.`,
+    `I just unlocked **48 hours of VIP access** for you.`,
     ``,
-    `✅ I just activated your **${TRIAL_HOURS}-hour VIP trial** — go check the **VIP Picks** category now.`,
+    `This is exactly what our paid members see:`,
+    `✅ Real picks from famous cappers`,
+    `✅ Posted before games`,
+    `✅ No fluff, no BS`,
     ``,
-    `If you want to keep access after the trial ends, I’ll send you the instant upgrade link 🔐`,
+    `⏳ You’ve got **48 hours** to check results and decide.`,
+    ``,
+    `Head to **VIP Picks** and see if it’s worth keeping 🔍`,
+    `I’ll send the upgrade link when your trial ends.`,
   ].join("\n");
 }
 
 function expiredDM(userId) {
   return [
-    `Hey <@${userId}> — your **free VIP trial just ended** ⏳`,
+    `Hey <@${userId}> — your **VIP trial just ended** ⏳`,
     ``,
-    `Don’t lose access to the VIP capper picks.`,
+    `Your access to the VIP capper picks is now locked.`,
     ``,
-    `✅ Re-activate VIP instantly here:`,
-    `${PAYMENT_LINK}`,
+    `🔓 Get VIP back instantly here:`,
+    `👉 ${PAYMENT_LINK}`,
     ``,
-    `Once you checkout, your access is restored automatically.`,
+    `Once you checkout, access is restored automatically — no waiting.`,
+    ``,
+    `Most members rejoin the same day so they don’t miss plays.`,
   ].join("\n");
 }
 
 function noTrialDM(userId) {
   return [
-    `Hey <@${userId}> — welcome back 🟣`,
+    `Hey <@${userId}> 👋`,
     ``,
-    `Your free trial has already been used on this Discord account.`,
+    `You’ve already used your free VIP trial on this account.`,
     ``,
-    `✅ Get instant VIP access here:`,
-    `${PAYMENT_LINK}`,
+    `If you want access again, you can unlock VIP here:`,
+    `👉 ${PAYMENT_LINK}`,
+    ``,
+    `Access is instant after checkout 🔐`,
   ].join("\n");
 }
+
 
 // ---------- Join flow ----------
 client.on(Events.GuildMemberAdd, async (member) => {
