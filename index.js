@@ -133,7 +133,7 @@ function questionsFooter() {
   return [
     ``,
     `❓ **Questions?**`,
-    `DM <@1374514852701143091> or message us on Telegram: https://t.me/waroncappers`,
+    `DM <@1374514852701143091> or message us on Telegram: https://t.me/splitthepicks`,
   ].join("\n");
 }
 
