@@ -146,7 +146,7 @@ function welcomeDM(userId) {
     ``,
     `Here’s how the server works 👇`,
     ``,
-    `🆓 **Free Section**`,
+    `🎁 **Free Section**`,
     `• Access smaller & mid-tier sports handicappers`,
     `• Higher volume, mixed performance`,
     ``,
@@ -202,6 +202,28 @@ function noTrialDM(userId) {
 }
 
 
+function postPurchaseDM(userId) {
+  return [
+    `Hey <@${userId}> 👋`,
+    ``,
+    `Your **VIP access to SplitThePicks** is now active 😈`,
+    ``,
+    `You’re unlocked into:`,
+    `💎 **Premium picks from elite cappers**`,
+    `📈 **Higher win rates & strong ROI**`,
+    `⏱️ Picks posted before games — no delay`,
+    ``,
+    `Open the server and head to **📈 VIP CAPPERS (ELITE)** to get started.`,
+    ``,
+    `⏳ If you don’t see VIP picks immediately, give Discord **1–2 minutes** to sync roles.`,
+    ``,
+    `❓ **Questions?**`,
+    `DM <@1374514852701143091> or message us on Telegram:`,
+    `https://t.me/splitthepicks`,
+  ].join("\n");
+}
+
+
 
 // ---------- Join flow ----------
 client.on(Events.GuildMemberAdd, async (member) => {
@@ -250,33 +272,36 @@ client.on(Events.GuildMemberAdd, async (member) => {
   }
 });
 
-// ---------- Payroll detection (subscribe/unsubscribe) ----------
-client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
   if (newMember.guild.id !== GUILD_ID) return;
 
-  const oldHadPayroll = oldMember.roles.cache.has(PAYROLL_ROLE_ID);
-  const newHadPayroll = newMember.roles.cache.has(PAYROLL_ROLE_ID);
+  const hadG1 = oldMember.roles.cache.has(PAYROLL_ROLE_ID); // g1
+  const hasG1 = newMember.roles.cache.has(PAYROLL_ROLE_ID);
 
-  // SUBSCRIBE (Payroll added g1)
-  if (!oldHadPayroll && newHadPayroll) {
+  // 🔓 USER JUST SUBSCRIBED (Payroll added g1)
+  if (!hadG1 && hasG1) {
+    // mark paid in DB
     setPaid(newMember.user.id, true);
-    clearTrial(newMember.user.id);
 
-    // Camouflage: give exactly ONE random gate role and remove the rest
-    await enforceSingleGateRole(newMember, "Payment detected: enforce single gate role").catch(() => null);
-    return;
+    // clear any trial expiry so it never removes access
+    clearTrialExpiry(newMember.user.id);
+
+    // enforce single gate role (g1–g4)
+    await enforceSingleGateRole(newMember).catch(() => null);
+
+    // send post-purchase confirmation DM
+    await safeDM(newMember.user, postPurchaseDM(newMember.user.id));
   }
 
-  // UNSUBSCRIBE (Payroll removed g1)
-  if (oldHadPayroll && !newHadPayroll) {
+  // 🔒 USER LOST ACCESS (subscription expired / canceled / revoked)
+  if (hadG1 && !hasG1) {
     setPaid(newMember.user.id, false);
-    clearTrial(newMember.user.id);
 
-    // Remove all g-roles so access is gone even if camouflaged to g2–g4
-    await removeAllGateRoles(newMember, "Unsubscribed: removing all gate roles").catch(() => null);
-    return;
+    // remove all gate roles
+    await removeAllGateRoles(newMember).catch(() => null);
   }
 });
+
 
 // ---------- Expiry sweep (edge-case protected) ----------
 async function runExpirySweep() {
