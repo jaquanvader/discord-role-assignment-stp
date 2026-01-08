@@ -131,11 +131,13 @@ async function safeDM(user, content) {
 
 function questionsFooter() {
   return [
-    ``,
     `❓ **Questions?**`,
-    `DM @SplitThePicks or message us on Telegram: https://t.me/splitthepicks`,
+    `DM **@SplitThePicks** on Discord:`,
+    `https://discord.com/users/1374514852701143091`,
+    `or message us on Telegram: https://t.me/splitthepicks`,
   ].join("\n");
 }
+
 
 function welcomeDM(userId) {
   return [
@@ -217,11 +219,10 @@ function postPurchaseDM(userId) {
     ``,
     `⏳ If you don’t see VIP picks immediately, give Discord **1–2 minutes** to sync roles.`,
     ``,
-    `❓ **Questions?**`,
-    `DM @SplitThePicks or message us on Telegram:`,
-    `https://t.me/splitthepicks`,
+    questionsFooter(),
   ].join("\n");
 }
+
 
 
 
