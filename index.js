@@ -133,7 +133,7 @@ function questionsFooter() {
   return [
     ``,
     `❓ **Questions?**`,
-    `DM <@1374514852701143091> or message us on Telegram: https://t.me/splitthepicks`,
+    `DM @SplitThePicks or message us on Telegram: https://t.me/splitthepicks`,
   ].join("\n");
 }
 
@@ -218,7 +218,7 @@ function postPurchaseDM(userId) {
     `⏳ If you don’t see VIP picks immediately, give Discord **1–2 minutes** to sync roles.`,
     ``,
     `❓ **Questions?**`,
-    `DM <@1374514852701143091> or message us on Telegram:`,
+    `DM @SplitThePicks or message us on Telegram:`,
     `https://t.me/splitthepicks`,
   ].join("\n");
 }
