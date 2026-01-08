@@ -272,35 +272,30 @@ client.on(Events.GuildMemberAdd, async (member) => {
   }
 });
 
-client.on("guildMemberUpdate", async (oldMember, newMember) => {
+client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   if (newMember.guild.id !== GUILD_ID) return;
 
-  const hadG1 = oldMember.roles.cache.has(PAYROLL_ROLE_ID); // g1
+  const hadG1 = oldMember.roles.cache.has(PAYROLL_ROLE_ID);
   const hasG1 = newMember.roles.cache.has(PAYROLL_ROLE_ID);
 
   // 🔓 USER JUST SUBSCRIBED (Payroll added g1)
   if (!hadG1 && hasG1) {
-    // mark paid in DB
     setPaid(newMember.user.id, true);
 
-    // clear any trial expiry so it never removes access
-    clearTrialExpiry(newMember.user.id);
+    // FIX: function name is clearTrial, not clearTrialExpiry
+    clearTrial(newMember.user.id);
 
-    // enforce single gate role (g1–g4)
-    await enforceSingleGateRole(newMember).catch(() => null);
-
-    // send post-purchase confirmation DM
+    await enforceSingleGateRole(newMember, "Payroll role added: enforce gate role").catch(() => null);
     await safeDM(newMember.user, postPurchaseDM(newMember.user.id));
   }
 
   // 🔒 USER LOST ACCESS (subscription expired / canceled / revoked)
   if (hadG1 && !hasG1) {
     setPaid(newMember.user.id, false);
-
-    // remove all gate roles
-    await removeAllGateRoles(newMember).catch(() => null);
+    await removeAllGateRoles(newMember, "Payroll role removed: revoke access").catch(() => null);
   }
 });
+
 
 
 // ---------- Expiry sweep (edge-case protected) ----------
