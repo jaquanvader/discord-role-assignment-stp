@@ -132,11 +132,12 @@ async function safeDM(user, content) {
 function questionsFooter() {
   return [
     `❓ **Questions?**`,
-    `DM **@SplitThePicks** on Discord:`,
+    `Message us on Discord:`,
     `https://discord.com/users/1374514852701143091`,
-    `or message us on Telegram: https://t.me/splitthepicks`,
+    `or on Telegram: https://t.me/splitthepicks`,
   ].join("\n");
 }
+
 
 
 function welcomeDM(userId) {
@@ -222,6 +223,7 @@ function postPurchaseDM(userId) {
     questionsFooter(),
   ].join("\n");
 }
+
 
 
 
