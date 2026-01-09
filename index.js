@@ -148,26 +148,29 @@ function welcomeDM(userId) {
     ``,
     `Here’s how the server works 👇`,
     ``,
-    `🎁 **Free Section**`,
+    `📈 **VIP Cappers (Elite)**`,
+    `• Picks from elite, well-known cappers`,
+    `• **KingCap, FiveStar, LaFormula, YDC, ISW, AFSports, Travy, Vonn5, Cesar** + more`,
+    `• Delivered instantly when they drop`,
+    ``,
+    `🔐 **Player Props**`,
+    `• Player props from top premiums`,
+    `• **snewj, professorpicks, securedtys, officialpicks** & more`,
+    `• Mirrored directly from their VIP servers`,
+    ``,
+    `🎁 **Free Cappers**`,
     `• Access smaller & mid-tier sports handicappers`,
     `• Higher volume, mixed performance`,
     ``,
-    `💎 **VIP Section**`,
-    `• Access our **elite-performing handicappers**`,
-    `• Consistently **high win rates & stronger ROI**`,
-    `• Top accounts like **KingCap, FiveStar, LaFormula, YDC, ISW, AFSports, Travy, Vonn5, Cesar** + more`,
-    `• Straight Bets, Parlays and Player Props included`,
-    `• Picks posted as soon as they drop — no delay`,
+    `⏳ You’ve got **48 hours** to review the VIP cappers and decide.`,
     ``,
-    `⏳ You’ve got **48 hours** to review the VIP results and decide.`,
-    ``,
-    `👉 Open the server: https://discord.gg/bsjBWPWzWM`,
-    `Then head to **📈 VIP CAPPERS (ELITE)** to check it out 🔍`,
+    `👉 Open the server here: https://discord.gg/q7EXxXbJx5`,
     ``,
     `I’ll send the upgrade link when your trial ends.`,
     questionsFooter(),
   ].join("\n");
 }
+
 
 
 function expiredDM(userId) {
@@ -177,7 +180,7 @@ function expiredDM(userId) {
     `VIP access is now locked.`,
     `You’ll still see free content, but VIP is where the **elite handicappers** are.`,
     ``,
-    `⚡ Picks are **mirrored in real time** and posted instantly in Discord once you’re VIP again.`,
+    `⚡ Their picks are **mirrored in real time** and posted instantly in Discord once you’re VIP again.`,
     ``,
     `🔓 Re-activate VIP here:`,
     `👉 ${PAYMENT_LINK}`,
@@ -194,7 +197,7 @@ function noTrialDM(userId) {
     `You’ve already used the **free VIP trial** on this account.`,
     ``,
     `📈 VIP includes picks from **elite sports-betting handicappers**`,
-    `⚡ Picks are **mirrored in real time** and posted instantly inside Discord.`,
+    `⚡ Their picks are **mirrored in real time** and posted instantly inside Discord.`,
     ``,
     `🔓 Unlock VIP here:`,
     `👉 ${PAYMENT_LINK}`,
@@ -213,16 +216,15 @@ function postPurchaseDM(userId) {
     ``,
     `You’re unlocked into:`,
     `💎 **Premium picks from elite cappers**`,
-    `📈 **Higher win rates & strong ROI**`,
-    `⏱️ Picks posted before games — no delay`,
-    ``,
-    `Open the server and head to **📈 VIP CAPPERS (ELITE)** to get started.`,
+    `📈 Straight bets, parlays and player props included`,
+    `⏱️ Picks posted as soon as they drop`,
     ``,
     `⏳ If you don’t see VIP picks immediately, give Discord **1–2 minutes** to sync roles.`,
     ``,
     questionsFooter(),
   ].join("\n");
 }
+
 
 
 
