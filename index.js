@@ -5,11 +5,11 @@ const { Client, GatewayIntentBits, Partials, Events } = require("discord.js");
 const {
   DISCORD_TOKEN,
   GUILD_ID,
-  ACCESS_ROLE_IDS,   // comma-separated role IDs for g1,g2,g3,g4
+  ACCESS_ROLE_IDS,   // comma-separated role IDs for gate roles ONLY: g2,g3,g4,g5
   PAYROLL_ROLE_ID,   // g1 role id (the one Payroll toggles on/off)
   PAYMENT_LINK,
   TRIAL_HOURS = "48",
-  MIN_ACCOUNT_AGE_DAYS = "0",
+  MIN_ACCOUNT_AGE_DAYS = "3",
 } = process.env;
 
 if (!DISCORD_TOKEN || !GUILD_ID || !ACCESS_ROLE_IDS || !PAYROLL_ROLE_ID || !PAYMENT_LINK) {
@@ -18,10 +18,23 @@ if (!DISCORD_TOKEN || !GUILD_ID || !ACCESS_ROLE_IDS || !PAYROLL_ROLE_ID || !PAYM
   );
 }
 
-const GATE_ROLE_IDS = ACCESS_ROLE_IDS.split(",").map(s => s.trim()).filter(Boolean);
-if (GATE_ROLE_IDS.length < 2) {
-  throw new Error("ACCESS_ROLE_IDS must include 2+ role IDs (recommended: 4 for g1–g4).");
+// ------------------------------------------------------------
+// ROLE MODEL (IMPORTANT)
+// - PAYROLL_ROLE_ID (g1) is ONLY for Payroll to toggle.
+// - Gate roles are g2–g5 (anonymous access buckets).
+// - The bot will NEVER assign PAYROLL_ROLE_ID.
+// ------------------------------------------------------------
+const ALL_ACCESS_ROLE_IDS = ACCESS_ROLE_IDS.split(",").map(s => s.trim()).filter(Boolean);
+
+// Gate roles are ALL_ACCESS_ROLE_IDS EXCEPT the Payroll role (g1)
+const GATE_ROLE_IDS = ALL_ACCESS_ROLE_IDS; // already g2–g5
+
+
+// Safety checks
+if (ALL_ACCESS_ROLE_IDS.length < 2) {
+  throw new Error("ACCESS_ROLE_IDS must include at least 2 gate role IDs (ex: g2,g3,g4,g5).");
 }
+
 
 const TRIAL_MS = parseFloat(TRIAL_HOURS) * 60 * 60 * 1000;
 const MIN_AGE_MS = parseInt(MIN_ACCOUNT_AGE_DAYS, 10) * 24 * 60 * 60 * 1000;
@@ -29,8 +42,7 @@ const MIN_AGE_MS = parseInt(MIN_ACCOUNT_AGE_DAYS, 10) * 24 * 60 * 60 * 1000;
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers, // required
-    // No need for DirectMessages intent to SEND DMs
+    GatewayIntentBits.GuildMembers, // required for joins + role changes
   ],
   partials: [Partials.Channel],
 });
@@ -81,7 +93,7 @@ function getExpiredTrials() {
     .all(now());
 }
 
-// ---------- Role helpers ----------
+// ---------- Role helpers (ONLY gate roles g2–g5) ----------
 function pickRandomGateRoleId() {
   return GATE_ROLE_IDS[Math.floor(Math.random() * GATE_ROLE_IDS.length)];
 }
@@ -136,9 +148,6 @@ function questionsFooter() {
   ].join("\n");
 }
 
-
-
-
 function welcomeDM(userId) {
   return [
     `Hey <@${userId}> 👋`,
@@ -170,8 +179,6 @@ function welcomeDM(userId) {
     questionsFooter(),
   ].join("\n");
 }
-
-
 
 function expiredDM(userId) {
   return [
@@ -207,7 +214,6 @@ function noTrialDM(userId) {
   ].join("\n");
 }
 
-
 function postPurchaseDM(userId) {
   return [
     `Hey <@${userId}> 👋`,
@@ -225,19 +231,14 @@ function postPurchaseDM(userId) {
   ].join("\n");
 }
 
-
-
-
-
-
-
 // ---------- Join flow ----------
 client.on(Events.GuildMemberAdd, async (member) => {
   if (member.guild.id !== GUILD_ID) return;
 
   upsertJoin(member.user.id);
 
-  // If they already have Payroll role, treat as paid immediately
+  // If they already have Payroll role (g1), treat as paid immediately.
+  // NOTE: The bot still assigns a gate role (g2–g5) for anonymity buckets.
   if (member.roles.cache.has(PAYROLL_ROLE_ID)) {
     setPaid(member.user.id, true);
     clearTrial(member.user.id);
@@ -262,7 +263,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
   const row = getUser(member.user.id);
 
-  // One-time trial
+  // One-time trial (assign ONLY gate roles g2–g5)
   if (!row || row.trial_used === 0) {
     const gateRoleId = pickRandomGateRoleId();
     const role = await fetchRole(member.guild, gateRoleId);
@@ -271,7 +272,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     const expiresAt = now() + TRIAL_MS;
     startTrial(member.user.id, expiresAt, gateRoleId);
 
-    await member.roles.add(role, "Trial: granting gate role").catch(() => null);
+    await member.roles.add(role, "Trial: granting gate role (g2–g5)").catch(() => null);
     await safeDM(member.user, welcomeDM(member.user.id));
   } else {
     await safeDM(member.user, noTrialDM(member.user.id));
@@ -281,28 +282,31 @@ client.on(Events.GuildMemberAdd, async (member) => {
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   if (newMember.guild.id !== GUILD_ID) return;
 
-  const hadG1 = oldMember.roles.cache.has(PAYROLL_ROLE_ID);
-  const hasG1 = newMember.roles.cache.has(PAYROLL_ROLE_ID);
+  const hadPayroll = oldMember.roles.cache.has(PAYROLL_ROLE_ID); // g1
+  const hasPayroll = newMember.roles.cache.has(PAYROLL_ROLE_ID);
 
   // 🔓 USER JUST SUBSCRIBED (Payroll added g1)
-  if (!hadG1 && hasG1) {
+  if (!hadPayroll && hasPayroll) {
     setPaid(newMember.user.id, true);
 
-    // FIX: function name is clearTrial, not clearTrialExpiry
+    // clear any trial expiry so it never removes access
     clearTrial(newMember.user.id);
 
+    // ensure exactly one gate role (g2–g5)
     await enforceSingleGateRole(newMember, "Payroll role added: enforce gate role").catch(() => null);
+
+    // send post-purchase confirmation DM
     await safeDM(newMember.user, postPurchaseDM(newMember.user.id));
   }
 
   // 🔒 USER LOST ACCESS (subscription expired / canceled / revoked)
-  if (hadG1 && !hasG1) {
+  if (hadPayroll && !hasPayroll) {
     setPaid(newMember.user.id, false);
+
+    // remove all gate roles (g2–g5)
     await removeAllGateRoles(newMember, "Payroll role removed: revoke access").catch(() => null);
   }
 });
-
-
 
 // ---------- Expiry sweep (edge-case protected) ----------
 async function runExpirySweep() {
@@ -316,7 +320,7 @@ async function runExpirySweep() {
     const member = await guild.members.fetch(row.discord_user_id).catch(() => null);
     if (!member) continue;
 
-    // EDGE CASE FIX: if Payroll role exists right now, treat as paid and DO NOT remove access
+    // EDGE CASE: if Payroll role exists, treat as paid and DO NOT remove access
     if (member.roles.cache.has(PAYROLL_ROLE_ID)) {
       setPaid(row.discord_user_id, true);
       clearTrial(row.discord_user_id);
@@ -327,7 +331,7 @@ async function runExpirySweep() {
     const fresh = getUser(row.discord_user_id);
     if (fresh?.paid === 1) continue;
 
-    // Remove the trial gate role if it exists
+    // Remove the recorded trial gate role if it exists
     if (row.gate_role_id && member.roles.cache.has(row.gate_role_id)) {
       const r = await fetchRole(guild, row.gate_role_id);
       if (r) await member.roles.remove(r, "Trial expired").catch(() => null);
