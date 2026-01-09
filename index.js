@@ -250,16 +250,29 @@ client.on(Events.GuildMemberAdd, async (member) => {
   if (memberGateRoles(member).length > 0) return;
 
   // Account age gate (optional)
-  if (MIN_AGE_MS > 0) {
-    const age = now() - member.user.createdTimestamp;
-    if (age < MIN_AGE_MS) {
-      await safeDM(
-        member.user,
-        `Hey <@${member.user.id}> — quick security check: your Discord account is too new to receive a free trial.\n\n✅ You can still get instant VIP access here:\n${PAYMENT_LINK}`
-      );
-      return;
-    }
+if (MIN_AGE_MS > 0) {
+  const age = now() - member.user.createdTimestamp;
+  if (age < MIN_AGE_MS) {
+    await safeDM(
+      member.user,
+      [
+        `Hey <@${member.user.id}> 👋`,
+        ``,
+        `Quick security check — your Discord account is too new to receive a free VIP trial.`,
+        ``,
+        `🎁 **Good news:** You can still access the **Free Cappers** section inside the server right now.`,
+        `It includes a wide range of smaller & mid-tier handicappers.`,
+        ``,
+        `🔓 If you want instant access to our **elite-performing VIP cappers**, you can upgrade here:`,
+        `${PAYMENT_LINK}`,
+        ``,
+        `Once you checkout, access is restored automatically.`,
+      ].join("\n")
+    );
+    return;
   }
+}
+
 
   const row = getUser(member.user.id);
 
